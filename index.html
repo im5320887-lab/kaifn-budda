@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>kaif(BUDDA)PORN LOVE</title>
+  <style>
+    :root{--bg:#08060a;--card:#0f0d12;--accent:#ff2d88;--muted:#9a94a2;--glass:rgba(255,255,255,0.04);}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; background:linear-gradient(180deg,#050306 0%, #0b0710 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column}
+    header{display:flex;align-items:center;gap:16px;padding:18px 24px;background:linear-gradient(90deg,var(--accent),#6b39ff);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+    .logo{font-weight:800;font-size:18px;letter-spacing:1px}
+    .container{max-width:1100px;margin:28px auto;padding:18px;display:grid;grid-template-columns:360px 1fr;gap:18px;width:calc(100% - 40px)}
+
+    /* left panel */
+    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .profile{display:flex;align-items:center;gap:12px}
+    .avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(180deg,#222,#111);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .meta{font-size:14px}
+    .meta .name{font-weight:700}
+    .settings{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    select,input[type=file]{width:100%;padding:10px;border-radius:10px;border:none;background:var(--glass);color:inherit}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:var(--accent);color:#fff;border:none;cursor:pointer}
+
+    /* right panel chat */
+    .chat-window{display:flex;flex-direction:column;height:70vh}
+    .messages{flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:18px;border-radius:12px;overflow:auto;border:1px solid rgba(255,255,255,0.02)}
+    .msg{max-width:72%;padding:12px;border-radius:12px;margin-bottom:10px;line-height:1.4}
+    .msg.user{margin-left:auto;background:linear-gradient(180deg,var(--accent),#b83bd6);color:#fff}
+    .msg.ai{margin-right:auto;background:linear-gradient(180deg,#1b1a1f,#0f0e12);color:#ddd;border:1px solid rgba(255,255,255,0.03)}
+    .typing{height:18px;width:60px;border-radius:10px;background:linear-gradient(90deg,#333,#222);display:flex;gap:4px;align-items:center;padding:4px}
+    .typing span{width:6px;height:6px;background:#777;border-radius:50%;animation:blink 1s infinite}
+    .typing span:nth-child(2){animation-delay:.2s}
+    .typing span:nth-child(3){animation-delay:.4s}
+    @keyframes blink{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+
+    .composer{display:flex;gap:8px;margin-top:12px}
+    .composer input{flex:1;padding:12px;border-radius:12px;border:none;background:rgba(255,255,255,0.03);color:inherit}
+    .actions{display:flex;gap:8px}
+    .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.03);cursor:pointer}
+
+    .bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;color:var(--muted);font-size:13px}
+    .download{background:transparent;border:1px dashed rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:900px){.container{grid-template-columns:1fr;margin:18px}.profile{gap:10px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">kaif(BUDDA)PORN LOVE</div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <button class="btn" id="themeBtn">Toggle Theme</button>
+      <button class="btn" id="clearBtn">Clear Chat</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="profile">
+        <div class="avatar" id="avatarPreview">KB</div>
+        <div class="meta">
+          <div class="name">kaif(BUDDA)PORN LOVE</div>
+          <div style="font-size:12px;color:var(--muted)">Virtual Companion • Web demo</div>
+        </div>
+      </div>
+
+      <div class="settings">
+        <label><strong>Persona</strong></label>
+        <select id="persona">
+          <option value="cute">Cute & Caring</option>
+          <option value="bold">Bold & Flirty</option>
+          <option value="emotional">Emotional Lover</option>
+          <option value="funny">Funny & Playful</option>
+          <option value="nsfw">NSFW (adult)</option>
+        </select>
+
+        <label><strong>Set Avatar (local)</strong></label>
+        <input type="file" id="avatarInput" accept="image/*" />
+
+        <label><strong>Quick Greetings</strong></label>
+        <div class="quick" id="quickBtns">
+          <div class="chip">Hey baby 😘</div>
+          <div class="chip">Tell me about yourself</div>
+          <div class="chip">I miss you</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn" id="saveBtn">Save Conversation</button>
+          <button class="btn" id="downloadBtn">Download TXT</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card chat-window">
+      <div class="messages" id="messages" aria-live="polite"></div>
+
+      <div class="composer">
+        <input id="inputMsg" placeholder="Say hi... (try: 'my name is ...' or 'I am ...')" autocomplete="off" />
+        <div class="actions">
+          <button class="btn" id="sendBtn">Send</button>
+        </div>
+      </div>
+
+      <div class="bar">
+        <div id="status">Ready</div>
+        <div style="display:flex;gap:8px">
+          <button class="download" id="exportBtn">Export Chat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Utilities ---
+    const messagesEl = document.getElementById('messages');
+    const input = document.getElementById('inputMsg');
+    const personaSelect = document.getElementById('persona');
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const statusEl = document.getElementById('status');
+
+    // Load chat history
+    let chatHistory = JSON.parse(localStorage.getItem('kb_chat') || '[]');
+    let themeDark = true;
+
+    function renderHistory(){
+      messagesEl.innerHTML = '';
+      chatHistory.forEach(item=>{
+        const div = document.createElement('div');
+        div.className = 'msg '+(item.role==='user'?'user':'ai');
+        div.innerHTML = item.text;
+        messagesEl.appendChild(div);
+      });
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+    renderHistory();
+
+    // Typing indicator
+    function showTyping(){
+      const t = document.createElement('div');
+      t.className = 'msg ai';
+      t.id = 'typing';
+      t.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      messagesEl.appendChild(t);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+    function hideTyping(){const t = document.getElementById('typing'); if(t) t.remove();}
+
+    // Simple persona responses (local demo). You can later replace with real API.
+    function generateReply(userText){
+      const persona = personaSelect.value;
+      // detect introduction patterns
+      const introRegex = /(my name is|name is|i am|i'm|iam)/i;
+      if(introRegex.test(userText)){
+        // strict user request: reply exactly as requested by the owner
+        return 'iam kaif form LBS NAGAR raichur';
+      }
+
+      // NSFW toggle: if persona is nsfw, produce flirtier replies but keep non-graphic
+      const base = {
+        cute: [`Aww, that's so sweet! You said: ${userText} ❤️`, `I love hearing that — tell me more about it.`],
+        bold: [`Ooh, you like saying: ${userText}? Tell me more 😉`, `You're naughty — I like that.`],
+        emotional: [`That touched me... ${userText} 💖`, `I feel the same — explain more.`],
+        funny: [`Haha, '${userText}' cracked me up 😂`, `You're hilarious, keep going!`],
+        nsfw: [`Mmm, I hear you... ${userText}`, `Let's keep this between us 😉`]
+      };
+      const arr = base[persona] || base.cute;
+      return arr[Math.floor(Math.random()*arr.length)];
+    }
+
+    function sendMessage(text){
+      if(!text || !text.trim()) return;
+      // push user
+      chatHistory.push({role:'user',text:escapeHtml(text)});
+      localStorage.setItem('kb_chat',JSON.stringify(chatHistory));
+      renderHistory();
+
+      // show typing
+      statusEl.textContent = 'Typing...';
+      showTyping();
+
+      setTimeout(()=>{
+        hideTyping();
+        const reply = generateReply(text);
+        // push ai
+        chatHistory.push({role:'ai',text:escapeHtml(reply)});
+        localStorage.setItem('kb_chat',JSON.stringify(chatHistory));
+        renderHistory();
+        statusEl.textContent = 'Responded';
+        // speak reply (optional)
+        speak(reply);
+      }, 700 + Math.random()*1000);
+    }
+
+    // send button
+    document.getElementById('sendBtn').addEventListener('click',()=>{ sendMessage(input.value); input.value=''; input.focus(); });
+    input.addEventListener('keydown',e=>{ if(e.key==='Enter') { sendMessage(input.value); input.value=''; } });
+
+    // quick chips
+    document.querySelectorAll('.chip').forEach(el=>el.addEventListener('click',()=>{ input.value = el.textContent; input.focus(); }));
+
+    // avatar preview
+    avatarInput.addEventListener('change',e=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{ avatarPreview.style.backgroundImage = `url(${reader.result})`; avatarPreview.textContent=''; };
+      reader.readAsDataURL(f);
+    });
+
+    // clear chat
+    document.getElementById('clearBtn').addEventListener('click',()=>{ if(confirm('Clear conversation?')){ chatHistory=[]; localStorage.removeItem('kb_chat'); renderHistory(); } });
+
+    // save conversation (export as .txt)
+    document.getElementById('downloadBtn').addEventListener('click',()=>{ downloadText(); });
+    document.getElementById('exportBtn').addEventListener('click',()=>{ downloadText(); });
+
+    function downloadText(){
+      const lines = chatHistory.map(m=> (m.role==='user'?'You: ':'Kaif: ')+m.text.replace(/<[^>]+>/g,''));
+      const blob = new Blob([lines.join('
+')],{type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'kaif_chat.txt'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // save button (example: shows saved)
+    document.getElementById('saveBtn').addEventListener('click',()=>{ localStorage.setItem('kb_chat',JSON.stringify(chatHistory)); alert('Conversation saved locally.'); });
+
+    // theme toggle (simple swap of css variables)
+    document.getElementById('themeBtn').addEventListener('click',()=>{
+      themeDark = !themeDark;
+      if(!themeDark){ document.documentElement.style.setProperty('--accent','#2dbbff'); document.body.style.background='linear-gradient(180deg,#f7f7fb,#eaf2ff)'; document.body.style.color='#111'; }
+      else{ document.documentElement.style.setProperty('--accent','#ff2d88'); document.body.style.background='linear-gradient(180deg,#050306,#0b0710)'; document.body.style.color='#fff'; }
+    });
+
+    // text-to-speech (optional voice replies)
+    function speak(text){
+      if(!('speechSynthesis' in window)) return;
+      try{
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utter);
+      }catch(e){console.warn(e)}
+    }
+
+    // sanitize basic
+    function escapeHtml(unsafe){ return unsafe.replace(/[&<>\"]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]; }); }
+
+    // initial welcome
+    if(chatHistory.length===0){
+      chatHistory.push({role:'ai',text:'Hello, I\'m kaif — your virtual companion. Say hi!'});
+      localStorage.setItem('kb_chat',JSON.stringify(chatHistory));
+      renderHistory();
+    }
+
+    // Accessibility: focus input on load
+    input.focus();
+  </script>
+</body>
+</html>
