@@ -5,10 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>kaif(BUDDA)PORN LOVE</title>
   <style>
-    :root{--bg:#08060a;--card:#0f0d12;--accent:#ff2d88;--muted:#9a94a2;--glass:rgba(255,255,255,0.04);}
+    :root{
+      --bg:#08060a;--card:#0f0d12;--accent:#ff2d88;--muted:#9a94a2;--glass:rgba(255,255,255,0.04);
+      --text:#fff;
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; background:linear-gradient(180deg,#050306 0%, #0b0710 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column}
-    header{display:flex;align-items:center;gap:16px;padding:18px 24px;background:linear-gradient(90deg,var(--accent),#6b39ff);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;
+      background:linear-gradient(180deg,#050306 0%, #0b0710 100%);color:var(--text);
+      min-height:100vh;display:flex;flex-direction:column;
+    }
+    header{
+      display:flex;align-items:center;gap:16px;padding:18px 24px;
+      background:linear-gradient(90deg,var(--accent),#6b39ff);box-shadow:0 6px 30px rgba(0,0,0,0.6)
+    }
     .logo{font-weight:800;font-size:18px;letter-spacing:1px}
     .container{max-width:1100px;margin:28px auto;padding:18px;display:grid;grid-template-columns:360px 1fr;gap:18px;width:calc(100% - 40px)}
 
@@ -21,11 +31,12 @@
     .settings{margin-top:12px;display:flex;flex-direction:column;gap:8px}
     select,input[type=file]{width:100%;padding:10px;border-radius:10px;border:none;background:var(--glass);color:inherit}
     .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:var(--accent);color:#fff;border:none;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
 
     /* right panel chat */
     .chat-window{display:flex;flex-direction:column;height:70vh}
     .messages{flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:18px;border-radius:12px;overflow:auto;border:1px solid rgba(255,255,255,0.02)}
-    .msg{max-width:72%;padding:12px;border-radius:12px;margin-bottom:10px;line-height:1.4}
+    .msg{max-width:72%;padding:12px;border-radius:12px;margin-bottom:10px;line-height:1.4;word-break:break-word}
     .msg.user{margin-left:auto;background:linear-gradient(180deg,var(--accent),#b83bd6);color:#fff}
     .msg.ai{margin-right:auto;background:linear-gradient(180deg,#1b1a1f,#0f0e12);color:#ddd;border:1px solid rgba(255,255,255,0.03)}
     .typing{height:18px;width:60px;border-radius:10px;background:linear-gradient(90deg,#333,#222);display:flex;gap:4px;align-items:center;padding:4px}
@@ -42,6 +53,8 @@
 
     .bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;color:var(--muted);font-size:13px}
     .download{background:transparent;border:1px dashed rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted)}
+
+    .persona-note{font-size:12px;color:var(--muted);margin-top:6px}
 
     /* responsive */
     @media (max-width:900px){.container{grid-template-columns:1fr;margin:18px}.profile{gap:10px}}
@@ -73,17 +86,19 @@
           <option value="bold">Bold & Flirty</option>
           <option value="emotional">Emotional Lover</option>
           <option value="funny">Funny & Playful</option>
-          <option value="nsfw">NSFW (adult)</option>
+          <option value="nsfw">NSFW (adult - non-graphic)</option>
         </select>
+        <div class="persona-note">Choose how the assistant should reply. NSFW setting keeps replies flirtier but non-graphic.</div>
 
-        <label><strong>Set Avatar (local)</strong></label>
+        <label style="margin-top:8px"><strong>Set Avatar (local)</strong></label>
         <input type="file" id="avatarInput" accept="image/*" />
 
-        <label><strong>Quick Greetings</strong></label>
+        <label style="margin-top:8px"><strong>Quick Greetings</strong></label>
         <div class="quick" id="quickBtns">
           <div class="chip">Hey baby 😘</div>
           <div class="chip">Tell me about yourself</div>
           <div class="chip">I miss you</div>
+          <div class="chip">Hi</div>
         </div>
 
         <div style="display:flex;gap:8px;margin-top:10px">
@@ -113,7 +128,7 @@
   </div>
 
   <script>
-    // --- Utilities ---
+    // --- Utilities & DOM ---
     const messagesEl = document.getElementById('messages');
     const input = document.getElementById('inputMsg');
     const personaSelect = document.getElementById('persona');
@@ -125,11 +140,21 @@
     let chatHistory = JSON.parse(localStorage.getItem('kb_chat') || '[]');
     let themeDark = true;
 
+    // Sanitize text for HTML insertion (for display)
+    function escapeHtml(unsafe){
+      if (typeof unsafe !== 'string') return '';
+      return unsafe.replace(/[&<>"']/g, function(m){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+      });
+    }
+
+    // Render saved history
     function renderHistory(){
       messagesEl.innerHTML = '';
       chatHistory.forEach(item=>{
         const div = document.createElement('div');
         div.className = 'msg '+(item.role==='user'?'user':'ai');
+        // insert as text (already escaped)
         div.innerHTML = item.text;
         messagesEl.appendChild(div);
       });
@@ -148,94 +173,210 @@
     }
     function hideTyping(){const t = document.getElementById('typing'); if(t) t.remove();}
 
-    // Simple persona responses (local demo). You can later replace with real API.
-    function generateReply(userText){
-      const persona = personaSelect.value;
-      // detect introduction patterns
-      const introRegex = /(my name is|name is|i am|i'm|iam)/i;
-      if(introRegex.test(userText)){
-        // strict user request: reply exactly as requested by the owner
-        return 'iam kaif form LBS NAGAR raichur';
-      }
+    // Fixed phrase required by user for introductions/greetings
+    const FIXED_INTRO_REPLY = "iam kaif form LBS NAGAR raichur iam interested in both girls and boys";
 
-      // NSFW toggle: if persona is nsfw, produce flirtier replies but keep non-graphic
-      const base = {
-        cute: [`Aww, that's so sweet! You said: ${userText} ❤️`, `I love hearing that — tell me more about it.`],
-        bold: [`Ooh, you like saying: ${userText}? Tell me more 😉`, `You're naughty — I like that.`],
-        emotional: [`That touched me... ${userText} 💖`, `I feel the same — explain more.`],
-        funny: [`Haha, '${userText}' cracked me up 😂`, `You're hilarious, keep going!`],
-        nsfw: [`Mmm, I hear you... ${userText}`, `Let's keep this between us 😉`]
-      };
-      const arr = base[persona] || base.cute;
-      return arr[Math.floor(Math.random()*arr.length)];
+    // Patterns that should trigger the fixed intro reply
+    const introPatterns = [
+      /\bhi\b/i, /\bhello\b/i, /\bhey\b/i, /\bhii\b/i, /\bhiiii\b/i, /\bhye\b/i, /\bhelo\b/i,
+      /\bbaby\b/i, /\bmy name is\b/i, /\bname is\b/i, /\bi am\b/i, /\bi'm\b/i, /\biam\b/i
+    ];
+
+    // Helper: detect if text matches any of the intro patterns
+    function isIntroOrGreeting(text){
+      if(!text) return false;
+      for(const p of introPatterns){
+        if(p.test(text)) return true;
+      }
+      return false;
     }
 
+    // Generate reply (smarter)
+    function generateReply(userText){
+      const raw = (userText||'').trim();
+      const lower = raw.toLowerCase();
+
+      // 1) If intro/greeting/mention of 'baby' → fixed required reply
+      if(isIntroOrGreeting(lower)){
+        return FIXED_INTRO_REPLY;
+      }
+
+      // 2) Else produce persona-driven, ChatGPT-style replies (varied, professional + affectionate)
+      const persona = personaSelect.value;
+
+      // Templates per persona (polite, non-graphic)
+      const templates = {
+        cute: [
+          "That sounds so sweet — thank you for sharing. Tell me more about how that made you feel.",
+          "Aww, I like hearing that. I'm here for you — what's on your mind?",
+          "You have my full attention. Share anything, I'm listening with all my heart."
+        ],
+        bold: [
+          "Ooh, I love the energy — keep going. You're making me curious 😉",
+          "That's bold — I like it. What do you want to explore next?",
+          "You're confident, I respect that. Tell me one daring thing you've done lately."
+        ],
+        emotional: [
+          "That touched me... thank you for being honest. Do you want to talk more about it?",
+          "I can feel the emotion in your words. I'm right here, you can tell me anything.",
+          "Your feelings matter. Tell me what's weighing on you and we'll work through it together."
+        ],
+        funny: [
+          "Haha, that's a good one — you made me smile! Tell me another.",
+          "You're hilarious 😄. Keep the jokes coming, I could use a laugh.",
+          "Nice! You've got great timing. What's next, comedian?"
+        ],
+        nsfw: [
+          "I hear you — keeping it between us. Tell me what you're comfortable sharing.",
+          "Let's keep things flirty but respectful — I like where this is going.",
+          "Mmm, you're playful. I enjoy our private chat — what's on your mind?"
+        ]
+      };
+
+      // Slight context-aware tweaks: if user asks question vs statement
+      const isQuestion = raw.endsWith('?') || /\bhow\b|\bwhat\b|\bwhy\b|\bwhen\b|\bwhere\b/.test(lower);
+
+      // Choose a base template
+      const baseArr = templates[persona] || templates.cute;
+      let choice = baseArr[Math.floor(Math.random()*baseArr.length)];
+
+      // If user asked a question, make reply partially answering in a general friendly way
+      if(isQuestion){
+        // Simple heuristic: if user asks about 'feel', 'love', 'relationship', etc.
+        if(/\bfeel\b|\blove\b|\brelationship\b|\bdate\b|\bhow\b|\bwhat\b/.test(lower)){
+          choice = (persona === 'funny')
+            ? "Good question! From my side — be honest, communicate, and be kind. What part worries you most?"
+            : "That's an important question. Be honest with yourself and communicate clearly — do you want some practical tips?";
+        } else {
+          choice = (persona === 'bold')
+            ? "Answering that — I think you should go for it. What's stopping you?"
+            : "Great question. I can help — give me a bit more detail and I'll give a thoughtful answer.";
+        }
+      }
+
+      // Personalize by reflecting a short echo of the user's text (safe-echo)
+      const shortEcho = raw.length > 80 ? raw.slice(0,80) + '...' : raw;
+      // final reply assembled
+      return `${choice} — You said: "${shortEcho}"`;
+    }
+
+    // Push a message to history and render
+    function pushMessage(role, text){
+      const safe = escapeHtml(text).replace(/\n/g, '<br/>');
+      chatHistory.push({role, text: safe});
+      localStorage.setItem('kb_chat', JSON.stringify(chatHistory));
+      renderHistory();
+    }
+
+    // sendMessage (user triggers)
     function sendMessage(text){
       if(!text || !text.trim()) return;
-      // push user
-      chatHistory.push({role:'user',text:escapeHtml(text)});
-      localStorage.setItem('kb_chat',JSON.stringify(chatHistory));
-      renderHistory();
+      const userText = text.trim();
 
-      // show typing
+      // push user message (escaped)
+      pushMessage('user', userText);
+
+      // show typing & status
       statusEl.textContent = 'Typing...';
       showTyping();
 
+      // generate reply (simulate short delay)
+      const delay = 400 + Math.random()*900;
       setTimeout(()=>{
         hideTyping();
-        const reply = generateReply(text);
-        // push ai
-        chatHistory.push({role:'ai',text:escapeHtml(reply)});
-        localStorage.setItem('kb_chat',JSON.stringify(chatHistory));
-        renderHistory();
+        const reply = generateReply(userText);
+        pushMessage('ai', reply);
         statusEl.textContent = 'Responded';
-        // speak reply (optional)
+        // speak reply (text only)
         speak(reply);
-      }, 700 + Math.random()*1000);
+      }, delay);
     }
 
-    // send button
-    document.getElementById('sendBtn').addEventListener('click',()=>{ sendMessage(input.value); input.value=''; input.focus(); });
-    input.addEventListener('keydown',e=>{ if(e.key==='Enter') { sendMessage(input.value); input.value=''; } });
+    // Event listeners: send
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      sendMessage(input.value);
+      input.value = '';
+      input.focus();
+    });
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter' && !e.shiftKey){
+        e.preventDefault();
+        sendMessage(input.value);
+        input.value = '';
+      }
+    });
 
-    // quick chips
-    document.querySelectorAll('.chip').forEach(el=>el.addEventListener('click',()=>{ input.value = el.textContent; input.focus(); }));
+    // Quick chips
+    document.querySelectorAll('.chip').forEach(el => el.addEventListener('click', () => {
+      input.value = el.textContent;
+      input.focus();
+    }));
 
-    // avatar preview
-    avatarInput.addEventListener('change',e=>{
+    // Avatar preview
+    avatarInput.addEventListener('change', e => {
       const f = e.target.files[0];
       if(!f) return;
       const reader = new FileReader();
-      reader.onload = ()=>{ avatarPreview.style.backgroundImage = `url(${reader.result})`; avatarPreview.textContent=''; };
+      reader.onload = () => {
+        avatarPreview.style.backgroundImage = `url(${reader.result})`;
+        avatarPreview.textContent = '';
+      };
       reader.readAsDataURL(f);
     });
 
-    // clear chat
-    document.getElementById('clearBtn').addEventListener('click',()=>{ if(confirm('Clear conversation?')){ chatHistory=[]; localStorage.removeItem('kb_chat'); renderHistory(); } });
-
-    // save conversation (export as .txt)
-    document.getElementById('downloadBtn').addEventListener('click',()=>{ downloadText(); });
-    document.getElementById('exportBtn').addEventListener('click',()=>{ downloadText(); });
-
-    function downloadText(){
-      const lines = chatHistory.map(m=> (m.role==='user'?'You: ':'Kaif: ')+m.text.replace(/<[^>]+>/g,''));
-      const blob = new Blob([lines.join('
-')],{type:'text/plain'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'kaif_chat.txt'; a.click(); URL.revokeObjectURL(url);
-    }
-
-    // save button (example: shows saved)
-    document.getElementById('saveBtn').addEventListener('click',()=>{ localStorage.setItem('kb_chat',JSON.stringify(chatHistory)); alert('Conversation saved locally.'); });
-
-    // theme toggle (simple swap of css variables)
-    document.getElementById('themeBtn').addEventListener('click',()=>{
-      themeDark = !themeDark;
-      if(!themeDark){ document.documentElement.style.setProperty('--accent','#2dbbff'); document.body.style.background='linear-gradient(180deg,#f7f7fb,#eaf2ff)'; document.body.style.color='#111'; }
-      else{ document.documentElement.style.setProperty('--accent','#ff2d88'); document.body.style.background='linear-gradient(180deg,#050306,#0b0710)'; document.body.style.color='#fff'; }
+    // Clear chat with confirmation
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if(confirm('Clear conversation?')){
+        chatHistory = [];
+        localStorage.removeItem('kb_chat');
+        renderHistory();
+        statusEl.textContent = 'Cleared';
+      }
     });
 
-    // text-to-speech (optional voice replies)
+    // Save conversation (localStorage already saves, but keep explicit save)
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      localStorage.setItem('kb_chat', JSON.stringify(chatHistory));
+      alert('Conversation saved locally.');
+    });
+
+    // Download conversation as TXT
+    document.getElementById('downloadBtn').addEventListener('click', downloadText);
+    document.getElementById('exportBtn').addEventListener('click', downloadText);
+
+    function downloadText(){
+      const lines = chatHistory.map(m => {
+        // remove any HTML tags for plain text output
+        const txt = m.text.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+        return (m.role === 'user' ? 'You: ' : 'Kaif: ') + txt;
+      });
+      const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'kaif_chat.txt'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Theme toggle
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      themeDark = !themeDark;
+      if(!themeDark){
+        document.documentElement.style.setProperty('--accent','#2dbbff');
+        document.documentElement.style.setProperty('--card','#ffffff');
+        document.documentElement.style.setProperty('--muted','#6b7280');
+        document.body.style.background = 'linear-gradient(180deg,#f7f7fb,#eaf2ff)';
+        document.body.style.color = '#111';
+        document.querySelectorAll('.card').forEach(c => c.style.background = '#ffffff');
+      } else {
+        document.documentElement.style.setProperty('--accent','#ff2d88');
+        document.documentElement.style.setProperty('--card','#0f0d12');
+        document.documentElement.style.setProperty('--muted','#9a94a2');
+        document.body.style.background = 'linear-gradient(180deg,#050306,#0b0710)';
+        document.body.style.color = '#fff';
+        document.querySelectorAll('.card').forEach(c => c.style.background = '');
+      }
+    });
+
+    // Text-to-speech
     function speak(text){
       if(!('speechSynthesis' in window)) return;
       try{
@@ -246,17 +387,14 @@
       }catch(e){console.warn(e)}
     }
 
-    // sanitize basic
-    function escapeHtml(unsafe){ return unsafe.replace(/[&<>\"]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]; }); }
-
-    // initial welcome
-    if(chatHistory.length===0){
-      chatHistory.push({role:'ai',text:'Hello, I\'m kaif — your virtual companion. Say hi!'});
-      localStorage.setItem('kb_chat',JSON.stringify(chatHistory));
+    // Initial welcome if empty
+    if(chatHistory.length === 0){
+      chatHistory.push({role:'ai', text: escapeHtml("Hello, I'm kaif — your virtual companion. Say hi!")});
+      localStorage.setItem('kb_chat', JSON.stringify(chatHistory));
       renderHistory();
     }
 
-    // Accessibility: focus input on load
+    // Focus input on load
     input.focus();
   </script>
 </body>
